@@ -1,0 +1,219 @@
+{
+  "report": "issues",
+  "query_scope": {
+    "tenant_id": "acme"
+  },
+  "evaluation_time": "2026-09-16T12:00:00Z",
+  "counts": {
+    "freshness": 1,
+    "unresolved_link": 3,
+    "conflicting_observation": 1,
+    "misleading_similarity": 4
+  },
+  "issues": [
+    {
+      "id": "freshness-001",
+      "category": "freshness",
+      "severity": "high",
+      "summary": "Collection tf-acme-prod-20260902T090000Z (terraform, scope {\"account_id\": \"111111111111\", \"environment\": \"prod\", \"region\": \"us-east-1\", \"resource_types\": [\"aws_instance\", \"aws_db_instance\"], \"workspace_id\": \"acme-prod-core\"}) was observed at 2026-09-02T09:00:00Z, 1220400 s before the evaluation time and over its 86400 s budget. Statements from it describe that time, not the evaluation time.",
+      "entities": [],
+      "evidence": [],
+      "affects": [
+        "question_a",
+        "question_b"
+      ],
+      "resolving_evidence": "A refreshed terraform collection from tf-acme-prod observed within 86400 s of the evaluation time."
+    },
+    {
+      "id": "unresolved_link-002",
+      "category": "unresolved_link",
+      "severity": "medium",
+      "summary": "backed_by from acme:k8s_node:acme-prod/f80cffe8-b4ef-591f-9aa6-0630e27725a9: insufficient_identifier. Node has no spec.providerID; an omitted provider reference is not an empty instance id. Look-alike records were listed but not used: i-00000000000000104, i-00000000000000105.",
+      "entities": [
+        "acme:k8s_node:acme-prod/f80cffe8-b4ef-591f-9aa6-0630e27725a9"
+      ],
+      "evidence": [
+        {
+          "file": "k8s_resources.json",
+          "locator": "/collections/0/items/2",
+          "snapshot_id": "k8s-acme-prod-20260916T115500Z",
+          "observed_at": "2026-09-16T11:55:00Z"
+        }
+      ],
+      "affects": [
+        "question_b"
+      ],
+      "resolving_evidence": "A Node spec.providerID, or a cloud-side statement (instance metadata, ENI attachment, node-group membership) naming the backing instance."
+    },
+    {
+      "id": "unresolved_link-003",
+      "category": "unresolved_link",
+      "severity": "medium",
+      "summary": "runs_as_workload from acme:catalog_application:svc-reports-prod: not_observed_in_scope. No Deployment reports-api observed in cluster acme-prod namespace production.",
+      "entities": [
+        "acme:catalog_application:svc-reports-prod"
+      ],
+      "evidence": [
+        {
+          "file": "service_catalog.csv",
+          "locator": "line 4",
+          "snapshot_id": "catalog-acme-20260916T114000Z",
+          "observed_at": "2026-09-16T11:40:00Z"
+        }
+      ],
+      "affects": [
+        "question_b"
+      ],
+      "resolving_evidence": "A Deployment with the referenced name in that cluster and namespace, or a catalog correction."
+    },
+    {
+      "id": "unresolved_link-004",
+      "category": "unresolved_link",
+      "severity": "medium",
+      "summary": "terraform_manages from acme:tf_resource:acme-prod-core/module.ops.aws_instance.toolbox: not_observed_in_scope. No ec2_instance with this ARN was observed in the tenant's AWS inventory.",
+      "entities": [
+        "acme:tf_resource:acme-prod-core/module.ops.aws_instance.toolbox"
+      ],
+      "evidence": [
+        {
+          "file": "terraform_state/acme-production.json",
+          "locator": "/resources/2",
+          "snapshot_id": "tf-acme-prod-20260902T090000Z",
+          "observed_at": "2026-09-02T09:00:00Z"
+        }
+      ],
+      "affects": [
+        "question_a",
+        "question_b"
+      ],
+      "resolving_evidence": "A current AWS inventory that contains the instance, or a refreshed state showing the resource removed."
+    },
+    {
+      "id": "conflicting_observation-005",
+      "category": "conflicting_observation",
+      "severity": "medium",
+      "summary": "acme:ec2_instance:arn:aws:ec2:us-east-1:111111111111:instance/i-00000000000000101: sources disagree on operator_team: 'team-platform' per aws-acme-prod-20260916T115000Z observed 2026-09-16T11:50:00Z; 'team-legacy-platform' per tf-acme-prod-20260902T090000Z observed 2026-09-02T09:00:00Z. Neither value is preferred; both are shown wherever the attribute is reported.",
+      "entities": [
+        "acme:ec2_instance:arn:aws:ec2:us-east-1:111111111111:instance/i-00000000000000101"
+      ],
+      "evidence": [
+        {
+          "file": "aws_inventory.json",
+          "locator": "/collections/0/instances/0",
+          "snapshot_id": "aws-acme-prod-20260916T115000Z",
+          "observed_at": "2026-09-16T11:50:00Z"
+        },
+        {
+          "file": "terraform_state/acme-production.json",
+          "locator": "/resources/0",
+          "snapshot_id": "tf-acme-prod-20260902T090000Z",
+          "observed_at": "2026-09-02T09:00:00Z"
+        }
+      ],
+      "affects": [
+        "question_a",
+        "question_b"
+      ],
+      "resolving_evidence": "A current observation of operator_team from the older source, or a designated source of record for that attribute."
+    },
+    {
+      "id": "misleading_similarity-006",
+      "category": "misleading_similarity",
+      "severity": "info",
+      "summary": "Terraform data source data.aws_instance.lookup references i-00000000000000103; a mode=data record reads an existing object and was not treated as a management binding.",
+      "entities": [
+        "acme:tf_resource:acme-prod-core/data.aws_instance.lookup",
+        "acme:ec2_instance:arn:aws:ec2:us-east-1:111111111111:instance/i-00000000000000103"
+      ],
+      "evidence": [
+        {
+          "file": "terraform_state/acme-production.json",
+          "locator": "/resources/4",
+          "snapshot_id": "tf-acme-prod-20260902T090000Z",
+          "observed_at": "2026-09-02T09:00:00Z"
+        }
+      ],
+      "affects": [
+        "question_a"
+      ],
+      "resolving_evidence": null
+    },
+    {
+      "id": "misleading_similarity-007",
+      "category": "misleading_similarity",
+      "severity": "info",
+      "summary": "i-00000000000000101 (account 111111111111) and i-00000000000000201 (account 222222222222) share name, private_ip; they are distinct provider objects and were never matched on those attributes.",
+      "entities": [
+        "acme:ec2_instance:arn:aws:ec2:us-east-1:111111111111:instance/i-00000000000000101",
+        "acme:ec2_instance:arn:aws:ec2:us-east-1:222222222222:instance/i-00000000000000201"
+      ],
+      "evidence": [],
+      "affects": [
+        "question_a",
+        "question_b"
+      ],
+      "resolving_evidence": null
+    },
+    {
+      "id": "misleading_similarity-008",
+      "category": "misleading_similarity",
+      "severity": "info",
+      "summary": "i-00000000000000104 (account 111111111111) and i-00000000000000105 (account 111111111111) share name, private_ip; they are distinct provider objects and were never matched on those attributes.",
+      "entities": [
+        "acme:ec2_instance:arn:aws:ec2:us-east-1:111111111111:instance/i-00000000000000104",
+        "acme:ec2_instance:arn:aws:ec2:us-east-1:111111111111:instance/i-00000000000000105"
+      ],
+      "evidence": [],
+      "affects": [
+        "question_a",
+        "question_b"
+      ],
+      "resolving_evidence": null
+    },
+    {
+      "id": "misleading_similarity-009",
+      "category": "misleading_similarity",
+      "severity": "info",
+      "summary": "Node name ip-10-0-4-118 is used in clusters ['acme-prod', 'acme-staging']; Node identity is (cluster, uid) and Pods resolve only to Nodes in their own cluster.",
+      "entities": [
+        "acme:k8s_node:acme-prod/05af1541-52fc-5b24-8da1-a0f5f4a6ba0a",
+        "acme:k8s_node:acme-staging/fd451955-3192-5366-8ec9-f1cee24af59a"
+      ],
+      "evidence": [],
+      "affects": [
+        "question_b"
+      ],
+      "resolving_evidence": null
+    }
+  ],
+  "cross_tenant_observations": {
+    "visibility": "platform operators only; never used in tenant answers",
+    "note": "The same provider object (ARN) was observed under more than one tenant. An external account is not a tenant identifier; each tenant's answers use only that tenant's collections.",
+    "items": [
+      {
+        "kind": "ec2_instance",
+        "arn": "arn:aws:ec2:us-east-1:111111111111:instance/i-00000000000000101",
+        "tenants": [
+          "acme",
+          "bravo"
+        ],
+        "sources": [
+          {
+            "file": "aws_inventory.json",
+            "locator": "/collections/0/instances/0",
+            "snapshot_id": "aws-acme-prod-20260916T115000Z",
+            "observed_at": "2026-09-16T11:50:00Z",
+            "tenant_id": "acme"
+          },
+          {
+            "file": "aws_inventory.json",
+            "locator": "/collections/2/instances/0",
+            "snapshot_id": "aws-bravo-prod-20260916T115200Z",
+            "observed_at": "2026-09-16T11:52:00Z",
+            "tenant_id": "bravo"
+          }
+        ]
+      }
+    ]
+  }
+}

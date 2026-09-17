@@ -1,0 +1,110 @@
+{
+  "report": "issues",
+  "query_scope": {
+    "tenant_id": "bravo"
+  },
+  "evaluation_time": "2026-09-16T12:00:00Z",
+  "counts": {
+    "coverage": 2,
+    "unresolved_link": 2
+  },
+  "issues": [
+    {
+      "id": "coverage-001",
+      "category": "coverage",
+      "severity": "high",
+      "summary": "Collection tf-bravo-prod-20260916 (terraform, scope {\"account_id\": \"111111111111\", \"environment\": \"prod\", \"region\": \"us-east-1\", \"resource_types\": [\"aws_instance\", \"aws_db_instance\"], \"workspace_id\": \"bravo-prod-core\"}) was not provided. Nothing in that scope can be confirmed or ruled out; an unavailable collection is not an empty inventory.",
+      "entities": [],
+      "evidence": [],
+      "affects": [
+        "question_a",
+        "question_b"
+      ],
+      "resolving_evidence": "A successful terraform collection from tf-bravo-prod with the declared scope."
+    },
+    {
+      "id": "coverage-002",
+      "category": "coverage",
+      "severity": "high",
+      "summary": "Collection k8s-bravo-prod-20260916 (kubernetes, scope {\"account_id\": \"111111111111\", \"cluster_id\": \"bravo-prod\", \"environment\": \"prod\", \"kinds\": [\"Deployment\", \"ReplicaSet\", \"Pod\", \"Node\"], \"namespaces\": [\"production\"], \"region\": \"us-east-1\"}) was not provided. Nothing in that scope can be confirmed or ruled out; an unavailable collection is not an empty inventory.",
+      "entities": [],
+      "evidence": [],
+      "affects": [
+        "question_b"
+      ],
+      "resolving_evidence": "A successful kubernetes collection from k8s-bravo-prod with the declared scope."
+    },
+    {
+      "id": "unresolved_link-003",
+      "category": "unresolved_link",
+      "severity": "high",
+      "summary": "declares_dependency from bravo:catalog_application:svc-payments-prod: no_covering_collection. No db_instance with this ARN observed in the tenant's AWS inventory.",
+      "entities": [
+        "bravo:catalog_application:svc-payments-prod"
+      ],
+      "evidence": [
+        {
+          "file": "service_catalog.csv",
+          "locator": "line 6",
+          "snapshot_id": "catalog-bravo-20260916T114500Z",
+          "observed_at": "2026-09-16T11:45:00Z"
+        }
+      ],
+      "affects": [
+        "question_b"
+      ],
+      "resolving_evidence": "An AWS collection for this tenant covering the dependency's account, region, and resource type."
+    },
+    {
+      "id": "unresolved_link-004",
+      "category": "unresolved_link",
+      "severity": "high",
+      "summary": "runs_as_workload from bravo:catalog_application:svc-payments-prod: evidence_unavailable. No Deployment payments-api observed in cluster bravo-prod namespace production.",
+      "entities": [
+        "bravo:catalog_application:svc-payments-prod"
+      ],
+      "evidence": [
+        {
+          "file": "service_catalog.csv",
+          "locator": "line 6",
+          "snapshot_id": "catalog-bravo-20260916T114500Z",
+          "observed_at": "2026-09-16T11:45:00Z"
+        }
+      ],
+      "affects": [
+        "question_b"
+      ],
+      "resolving_evidence": "The Kubernetes collection for the referenced cluster."
+    }
+  ],
+  "cross_tenant_observations": {
+    "visibility": "platform operators only; never used in tenant answers",
+    "note": "The same provider object (ARN) was observed under more than one tenant. An external account is not a tenant identifier; each tenant's answers use only that tenant's collections.",
+    "items": [
+      {
+        "kind": "ec2_instance",
+        "arn": "arn:aws:ec2:us-east-1:111111111111:instance/i-00000000000000101",
+        "tenants": [
+          "acme",
+          "bravo"
+        ],
+        "sources": [
+          {
+            "file": "aws_inventory.json",
+            "locator": "/collections/0/instances/0",
+            "snapshot_id": "aws-acme-prod-20260916T115000Z",
+            "observed_at": "2026-09-16T11:50:00Z",
+            "tenant_id": "acme"
+          },
+          {
+            "file": "aws_inventory.json",
+            "locator": "/collections/2/instances/0",
+            "snapshot_id": "aws-bravo-prod-20260916T115200Z",
+            "observed_at": "2026-09-16T11:52:00Z",
+            "tenant_id": "bravo"
+          }
+        ]
+      }
+    ]
+  }
+}

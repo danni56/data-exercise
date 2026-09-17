@@ -1,0 +1,277 @@
+{
+  "question": "B",
+  "title": "Application context and responsibility",
+  "query_scope": {
+    "tenant_id": "bravo",
+    "environment": "prod",
+    "application_name": "payments-api",
+    "catalog_scope": "Catalog collections for this tenant; rows matched on service_name and the row's own environment column"
+  },
+  "evaluation_time": "2026-09-16T12:00:00Z",
+  "sources": {
+    "catalog": [
+      {
+        "snapshot_id": "catalog-bravo-20260916T114500Z",
+        "source_family": "catalog",
+        "source_instance_id": "catalog-bravo",
+        "tenant_id": "bravo",
+        "status": "success",
+        "coverage": "complete",
+        "payload_path": "service_catalog.csv",
+        "scope": {
+          "environments": [
+            "prod"
+          ]
+        },
+        "freshness": {
+          "status": "fresh",
+          "observed_at": "2026-09-16T11:45:00Z",
+          "age_seconds": 900,
+          "budget_seconds": 86400,
+          "within_budget": true
+        }
+      }
+    ],
+    "kubernetes": [
+      {
+        "snapshot_id": "k8s-bravo-prod-20260916",
+        "source_family": "kubernetes",
+        "source_instance_id": "k8s-bravo-prod",
+        "tenant_id": "bravo",
+        "status": "not_provided",
+        "coverage": "unknown",
+        "payload_path": null,
+        "scope": {
+          "cluster_id": "bravo-prod",
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "environment": "prod",
+          "namespaces": [
+            "production"
+          ],
+          "kinds": [
+            "Deployment",
+            "ReplicaSet",
+            "Pod",
+            "Node"
+          ]
+        },
+        "freshness": {
+          "status": "unavailable",
+          "observed_at": null,
+          "age_seconds": null,
+          "budget_seconds": 900,
+          "within_budget": null
+        }
+      }
+    ],
+    "aws_inventory": [
+      {
+        "snapshot_id": "aws-bravo-prod-20260916T115200Z",
+        "source_family": "aws",
+        "source_instance_id": "aws-bravo-prod",
+        "tenant_id": "bravo",
+        "status": "success",
+        "coverage": "complete",
+        "payload_path": "aws_inventory.json",
+        "scope": {
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "environment": "prod",
+          "resource_types": [
+            "aws_instance"
+          ],
+          "instance_ids": [
+            "i-00000000000000101"
+          ]
+        },
+        "freshness": {
+          "status": "fresh",
+          "observed_at": "2026-09-16T11:52:00Z",
+          "age_seconds": 480,
+          "budget_seconds": 900,
+          "within_budget": true
+        }
+      }
+    ],
+    "terraform_state": [
+      {
+        "snapshot_id": "tf-bravo-prod-20260916",
+        "source_family": "terraform",
+        "source_instance_id": "tf-bravo-prod",
+        "tenant_id": "bravo",
+        "status": "not_provided",
+        "coverage": "unknown",
+        "payload_path": null,
+        "scope": {
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "environment": "prod",
+          "resource_types": [
+            "aws_instance",
+            "aws_db_instance"
+          ],
+          "workspace_id": "bravo-prod-core"
+        },
+        "freshness": {
+          "status": "unavailable",
+          "observed_at": null,
+          "age_seconds": null,
+          "budget_seconds": 86400,
+          "within_budget": null
+        }
+      }
+    ]
+  },
+  "relationship_semantics": {
+    "owner_team (catalog)": "Source statement: the catalog names the team responsible for the application. It says nothing about infrastructure.",
+    "declares_dependency": "Source statement (catalog ARN) resolved by ARN identity. A declaration of dependency, not an observed connection.",
+    "runs_as_workload": "Source statement (catalog cluster/namespace/deployment_name) resolved by Deployment name within that cluster and namespace. The catalog's only handle is a name, so this hop relies on the Deployment being present in a complete collection.",
+    "controlled_by": "Source statement (metadata.ownerReferences) resolved by UID within the cluster. Lifecycle control; UIDs distinguish incarnations that reuse a name.",
+    "scheduled_on": "Source statement (Pod spec.nodeName) resolved by Node name within the cluster. Placement at observation time only.",
+    "backed_by": "Source statement (Node spec.providerID) combined with the manifest's cluster account and region to form an EC2 ARN, then resolved by identity. Says which instance hosts the Node; it is not an application dependency.",
+    "operator_team (tag)": "Source statement by the AWS inventory or the Terraform state about who operates an infrastructure resource. Not application responsibility.",
+    "terraform_manages": "Source statement (values.arn of a mode=managed resource) resolved by ARN identity. Management at the state's observation time.",
+    "terraform_data_reference": "Source statement (values.arn of a mode=data resource). A read of an existing object; not a management binding."
+  },
+  "application": {
+    "service_id": "svc-payments-prod",
+    "service_name": [
+      {
+        "value": "payments-api",
+        "source": {
+          "file": "service_catalog.csv",
+          "locator": "line 6",
+          "snapshot_id": "catalog-bravo-20260916T114500Z",
+          "observed_at": "2026-09-16T11:45:00Z"
+        }
+      }
+    ],
+    "environment": [
+      {
+        "value": "prod",
+        "source": {
+          "file": "service_catalog.csv",
+          "locator": "line 6",
+          "snapshot_id": "catalog-bravo-20260916T114500Z",
+          "observed_at": "2026-09-16T11:45:00Z"
+        }
+      }
+    ],
+    "owner_team": {
+      "statement_kind": "source_statement",
+      "claims": [
+        {
+          "value": "team-bravo-apps",
+          "source": {
+            "file": "service_catalog.csv",
+            "locator": "line 6",
+            "snapshot_id": "catalog-bravo-20260916T114500Z",
+            "observed_at": "2026-09-16T11:45:00Z"
+          }
+        }
+      ]
+    },
+    "source": [
+      {
+        "file": "service_catalog.csv",
+        "locator": "line 6",
+        "snapshot_id": "catalog-bravo-20260916T114500Z",
+        "observed_at": "2026-09-16T11:45:00Z"
+      }
+    ]
+  },
+  "declared_dependencies": [
+    {
+      "declared_arn": "arn:aws:rds:us-east-1:111111111111:db:payments-db",
+      "statement_kind": "source_statement",
+      "stated_by": {
+        "file": "service_catalog.csv",
+        "locator": "line 6",
+        "snapshot_id": "catalog-bravo-20260916T114500Z",
+        "observed_at": "2026-09-16T11:45:00Z"
+      },
+      "resolution": {
+        "status": "no_covering_collection",
+        "meaning": "No supplied collection for this tenant covers the referenced object's scope; absence cannot be inferred.",
+        "rule": "dependency_arn_identity",
+        "detail": "No db_instance with this ARN observed in the tenant's AWS inventory.",
+        "scopes_consulted": [],
+        "candidates_not_used": []
+      }
+    }
+  ],
+  "workloads": [
+    {
+      "workload_reference": {
+        "cluster_id": "bravo-prod",
+        "namespace": "production",
+        "deployment_name": "payments-api"
+      },
+      "statement_kind": "source_statement",
+      "stated_by": {
+        "file": "service_catalog.csv",
+        "locator": "line 6",
+        "snapshot_id": "catalog-bravo-20260916T114500Z",
+        "observed_at": "2026-09-16T11:45:00Z"
+      },
+      "resolution": {
+        "status": "evidence_unavailable",
+        "meaning": "The collection that would cover the referenced object was declared but not provided; absence cannot be inferred.",
+        "rule": "deployment_name_in_cluster_namespace",
+        "detail": "No Deployment payments-api observed in cluster bravo-prod namespace production.",
+        "scopes_consulted": [
+          "k8s-bravo-prod-20260916"
+        ],
+        "candidates_not_used": []
+      }
+    }
+  ],
+  "responsibility": {
+    "application_team": {
+      "teams": [
+        "team-bravo-apps"
+      ],
+      "statement_kind": "source_statement",
+      "statement": "service_catalog.owner_team",
+      "source": [
+        {
+          "file": "service_catalog.csv",
+          "locator": "line 6",
+          "snapshot_id": "catalog-bravo-20260916T114500Z",
+          "observed_at": "2026-09-16T11:45:00Z"
+        }
+      ],
+      "meaning": "The catalog's statement of application responsibility. It says nothing about who operates nodes or databases."
+    },
+    "infrastructure_operators": [],
+    "derived_conclusions": [
+      "Application team: team-bravo-apps (catalog statement, not derived)."
+    ]
+  },
+  "path_stops": [
+    {
+      "at": "declared dependency arn:aws:rds:us-east-1:111111111111:db:payments-db",
+      "status": "no_covering_collection",
+      "why": "No db_instance with this ARN observed in the tenant's AWS inventory.",
+      "scopes_consulted": []
+    },
+    {
+      "at": "catalog workload reference -> Deployment payments-api in bravo-prod/production",
+      "status": "evidence_unavailable",
+      "why": "No Deployment payments-api observed in cluster bravo-prod namespace production.",
+      "scopes_consulted": [
+        "k8s-bravo-prod-20260916"
+      ]
+    }
+  ],
+  "not_linked_lookalikes": [],
+  "limitations": [
+    "Collection tf-bravo-prod-20260916 (terraform, scope {\"account_id\": \"111111111111\", \"environment\": \"prod\", \"region\": \"us-east-1\", \"resource_types\": [\"aws_instance\", \"aws_db_instance\"], \"workspace_id\": \"bravo-prod-core\"}) was not provided; references into that scope cannot be resolved or ruled out.",
+    "Collection k8s-bravo-prod-20260916 (kubernetes, scope {\"account_id\": \"111111111111\", \"cluster_id\": \"bravo-prod\", \"environment\": \"prod\", \"kinds\": [\"Deployment\", \"ReplicaSet\", \"Pod\", \"Node\"], \"namespaces\": [\"production\"], \"region\": \"us-east-1\"}) was not provided; references into that scope cannot be resolved or ruled out.",
+    "One or more hops did not resolve; each is listed in path_stops with the reason and the collections consulted.",
+    "Kubernetes Services, endpoints, network policies, and live traffic are not in the extract; the answer shows placement and declarations, not an observed runtime dependency.",
+    "VPC, subnet, and security-group objects are not supplied; the path ends at the EC2 and RDS instances.",
+    "The catalog extract carries at most one workload reference and one dependency per entry; undeclared dependencies may exist."
+  ]
+}

@@ -1,0 +1,184 @@
+{
+  "question": "A",
+  "title": "EC2 instances observed running in the requested environment, and Terraform managed-resource binding evidence",
+  "query_scope": {
+    "tenant_id": "bravo",
+    "environment": "prod",
+    "resource_kind": "ec2_instance",
+    "observed_state": "running",
+    "inventory_scope": "AWS collections for this tenant whose manifest scope environment matches and whose resource_types include aws_instance",
+    "terraform_scope": "Every Terraform collection supplied for this tenant whose scope covers the instance's account, region, and resource type"
+  },
+  "evaluation_time": "2026-09-16T12:00:00Z",
+  "sources": {
+    "aws_inventory": [
+      {
+        "snapshot_id": "aws-bravo-prod-20260916T115200Z",
+        "source_family": "aws",
+        "source_instance_id": "aws-bravo-prod",
+        "tenant_id": "bravo",
+        "status": "success",
+        "coverage": "complete",
+        "payload_path": "aws_inventory.json",
+        "scope": {
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "environment": "prod",
+          "resource_types": [
+            "aws_instance"
+          ],
+          "instance_ids": [
+            "i-00000000000000101"
+          ]
+        },
+        "freshness": {
+          "status": "fresh",
+          "observed_at": "2026-09-16T11:52:00Z",
+          "age_seconds": 480,
+          "budget_seconds": 900,
+          "within_budget": true
+        }
+      }
+    ],
+    "terraform_state": [
+      {
+        "snapshot_id": "tf-bravo-prod-20260916",
+        "source_family": "terraform",
+        "source_instance_id": "tf-bravo-prod",
+        "tenant_id": "bravo",
+        "status": "not_provided",
+        "coverage": "unknown",
+        "payload_path": null,
+        "scope": {
+          "account_id": "111111111111",
+          "region": "us-east-1",
+          "environment": "prod",
+          "resource_types": [
+            "aws_instance",
+            "aws_db_instance"
+          ],
+          "workspace_id": "bravo-prod-core"
+        },
+        "freshness": {
+          "status": "unavailable",
+          "observed_at": null,
+          "age_seconds": null,
+          "budget_seconds": 86400,
+          "within_budget": null
+        }
+      }
+    ]
+  },
+  "status_meanings": {
+    "binding_found": "A managed-resource record (mode=managed) referencing this object exists in the supplied state. It shows management at that state's observation time, not at the evaluation time.",
+    "no_binding_in_supplied_scope": "The supplied state covering this object's account, region, and resource type contains no managed-resource record for it at its observation time. This is not evidence that the object is unmanaged.",
+    "evidence_unavailable": "The state collection that would cover this object was declared but not provided, or nothing supplied covers it. Nothing can be concluded either way."
+  },
+  "instances": [
+    {
+      "instance_id": "i-00000000000000101",
+      "arn": "arn:aws:ec2:us-east-1:111111111111:instance/i-00000000000000101",
+      "account_id": "111111111111",
+      "region": "us-east-1",
+      "observed": {
+        "state": [
+          {
+            "value": "running",
+            "source": {
+              "file": "aws_inventory.json",
+              "locator": "/collections/2/instances/0",
+              "snapshot_id": "aws-bravo-prod-20260916T115200Z",
+              "observed_at": "2026-09-16T11:52:00Z"
+            }
+          }
+        ],
+        "name": [
+          {
+            "value": "worker-a",
+            "source": {
+              "file": "aws_inventory.json",
+              "locator": "/collections/2/instances/0",
+              "snapshot_id": "aws-bravo-prod-20260916T115200Z",
+              "observed_at": "2026-09-16T11:52:00Z"
+            }
+          }
+        ],
+        "private_ip": [
+          {
+            "value": "10.0.4.118",
+            "source": {
+              "file": "aws_inventory.json",
+              "locator": "/collections/2/instances/0",
+              "snapshot_id": "aws-bravo-prod-20260916T115200Z",
+              "observed_at": "2026-09-16T11:52:00Z"
+            }
+          }
+        ],
+        "vpc_id": [
+          {
+            "value": "vpc-0a1b2c3d4e5f60001",
+            "source": {
+              "file": "aws_inventory.json",
+              "locator": "/collections/2/instances/0",
+              "snapshot_id": "aws-bravo-prod-20260916T115200Z",
+              "observed_at": "2026-09-16T11:52:00Z"
+            }
+          }
+        ],
+        "environment_tag": [
+          {
+            "value": "prod",
+            "source": {
+              "file": "aws_inventory.json",
+              "locator": "/collections/2/instances/0",
+              "snapshot_id": "aws-bravo-prod-20260916T115200Z",
+              "observed_at": "2026-09-16T11:52:00Z"
+            }
+          }
+        ],
+        "operator_team": [
+          {
+            "value": "team-platform",
+            "source": {
+              "file": "aws_inventory.json",
+              "locator": "/collections/2/instances/0",
+              "snapshot_id": "aws-bravo-prod-20260916T115200Z",
+              "observed_at": "2026-09-16T11:52:00Z"
+            }
+          }
+        ]
+      },
+      "conflicting_observations": [],
+      "terraform_binding": {
+        "status": "evidence_unavailable",
+        "meaning": "The state collection that would cover this object was declared but not provided, or nothing supplied covers it. Nothing can be concluded either way.",
+        "managed_bindings": [],
+        "data_source_references": [],
+        "terraform_scopes_consulted": [
+          {
+            "snapshot_id": "tf-bravo-prod-20260916",
+            "workspace_id": "bravo-prod-core",
+            "status": "not_provided",
+            "coverage": "unknown",
+            "observed_at": null,
+            "freshness": {
+              "status": "unavailable",
+              "observed_at": null,
+              "age_seconds": null,
+              "budget_seconds": 86400,
+              "within_budget": null
+            }
+          }
+        ],
+        "interpretation": "The Terraform collection(s) that would cover this object's account and region (tf-bravo-prod-20260916) were not provided; whether a managed binding exists cannot be determined from the supplied evidence."
+      },
+      "limitations": []
+    }
+  ],
+  "excluded_instances": [],
+  "terraform_managed_instances_not_observed": [],
+  "limitations": [
+    "Terraform collection tf-bravo-prod-20260916 (workspace bravo-prod-core) was not provided; instances in its scope have unavailable binding evidence.",
+    "A Terraform collection establishes coverage only for its own workspace. An instance with no binding here may be managed by a workspace that was not supplied."
+  ]
+}
