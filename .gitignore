@@ -1,0 +1,28 @@
+# Python and local environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Machine-local files and secrets
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Local packaging and build output
+build/
+dist/
+*.egg-info/
+
+# Generated answers, design notes, and candidate tests are intentionally not ignored.

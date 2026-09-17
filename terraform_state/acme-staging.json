@@ -1,0 +1,28 @@
+{
+  "snapshot_id": "tf-acme-staging-20260916T113000Z",
+  "lineage": "a6d1e9ce-aaf3-4f50-ab02-98434c5b4372",
+  "serial": 8,
+  "resources": [
+    {
+      "address": "module.workers.aws_instance.pool[0]",
+      "mode": "managed",
+      "type": "aws_instance",
+      "values": {
+        "id": "i-00000000000000201",
+        "arn": "arn:aws:ec2:us-east-1:222222222222:instance/i-00000000000000201",
+        "tags": {
+          "operator_team": "team-platform-staging"
+        }
+      }
+    },
+    {
+      "address": "aws_db_instance.payments",
+      "mode": "managed",
+      "type": "aws_db_instance",
+      "values": {
+        "id": "payments-db",
+        "arn": "arn:aws:rds:us-east-1:222222222222:db:payments-db"
+      }
+    }
+  ]
+}

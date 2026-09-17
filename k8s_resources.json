@@ -1,0 +1,325 @@
+{
+  "collections": [
+    {
+      "snapshot_id": "k8s-acme-prod-20260916T115500Z",
+      "items": [
+        {
+          "apiVersion": "v1",
+          "kind": "Node",
+          "metadata": {
+            "name": "ip-10-0-4-118",
+            "uid": "05af1541-52fc-5b24-8da1-a0f5f4a6ba0a"
+          },
+          "spec": {
+            "providerID": "aws:///us-east-1a/i-00000000000000101"
+          },
+          "status": {
+            "addresses": [
+              {
+                "type": "InternalIP",
+                "address": "10.0.4.118"
+              }
+            ]
+          }
+        },
+        {
+          "apiVersion": "v1",
+          "kind": "Node",
+          "metadata": {
+            "name": "ip-10-0-4-119",
+            "uid": "caf1f496-24f5-5952-9b03-60873629056e"
+          },
+          "spec": {
+            "providerID": "aws:///us-east-1a/i-00000000000000102"
+          },
+          "status": {
+            "addresses": [
+              {
+                "type": "InternalIP",
+                "address": "10.0.4.119"
+              }
+            ]
+          }
+        },
+        {
+          "apiVersion": "v1",
+          "kind": "Node",
+          "metadata": {
+            "name": "ip-10-0-9-9",
+            "uid": "f80cffe8-b4ef-591f-9aa6-0630e27725a9"
+          },
+          "spec": {},
+          "status": {
+            "addresses": [
+              {
+                "type": "InternalIP",
+                "address": "10.0.9.9"
+              }
+            ]
+          }
+        },
+        {
+          "apiVersion": "apps/v1",
+          "kind": "Deployment",
+          "metadata": {
+            "name": "payments-api",
+            "uid": "88cf0def-a10d-596c-9a94-c08b2a96d271",
+            "namespace": "production"
+          },
+          "spec": {
+            "replicas": 2,
+            "selector": {
+              "matchLabels": {
+                "app": "payments-api"
+              }
+            }
+          }
+        },
+        {
+          "apiVersion": "apps/v1",
+          "kind": "ReplicaSet",
+          "metadata": {
+            "name": "payments-api-7c9d",
+            "uid": "94d46493-efc9-53f2-ac42-343437b41fe8",
+            "namespace": "production",
+            "ownerReferences": [
+              {
+                "apiVersion": "apps/v1",
+                "kind": "Deployment",
+                "name": "payments-api",
+                "uid": "88cf0def-a10d-596c-9a94-c08b2a96d271",
+                "controller": true
+              }
+            ]
+          },
+          "spec": {
+            "replicas": 2,
+            "selector": {
+              "matchLabels": {
+                "app": "payments-api"
+              }
+            }
+          }
+        },
+        {
+          "apiVersion": "v1",
+          "kind": "Pod",
+          "metadata": {
+            "name": "payments-api-7c9d-a",
+            "uid": "8f7c1763-6149-50fb-90a9-c303a86c0f83",
+            "namespace": "production",
+            "labels": {
+              "app": "payments-api"
+            },
+            "ownerReferences": [
+              {
+                "apiVersion": "apps/v1",
+                "kind": "ReplicaSet",
+                "name": "payments-api-7c9d",
+                "uid": "94d46493-efc9-53f2-ac42-343437b41fe8",
+                "controller": true
+              }
+            ]
+          },
+          "spec": {
+            "nodeName": "ip-10-0-4-118"
+          },
+          "status": {
+            "phase": "Running"
+          }
+        },
+        {
+          "apiVersion": "v1",
+          "kind": "Pod",
+          "metadata": {
+            "name": "payments-api-7c9d-b",
+            "uid": "26b01653-b52e-564f-8654-8ba25f285309",
+            "namespace": "production",
+            "labels": {
+              "app": "payments-api"
+            },
+            "ownerReferences": [
+              {
+                "apiVersion": "apps/v1",
+                "kind": "ReplicaSet",
+                "name": "payments-api-7c9d",
+                "uid": "94d46493-efc9-53f2-ac42-343437b41fe8",
+                "controller": true
+              }
+            ]
+          },
+          "spec": {
+            "nodeName": "ip-10-0-4-119"
+          },
+          "status": {
+            "phase": "Running"
+          }
+        },
+        {
+          "apiVersion": "apps/v1",
+          "kind": "Deployment",
+          "metadata": {
+            "name": "billing-api",
+            "uid": "783bb1ea-fefa-516e-a216-b8b291ce660a",
+            "namespace": "production"
+          },
+          "spec": {
+            "replicas": 1,
+            "selector": {
+              "matchLabels": {
+                "app": "billing-api"
+              }
+            }
+          }
+        },
+        {
+          "apiVersion": "apps/v1",
+          "kind": "ReplicaSet",
+          "metadata": {
+            "name": "billing-api-7c9d",
+            "uid": "73d2ad8e-eb56-5975-9818-4dcba27059f2",
+            "namespace": "production",
+            "ownerReferences": [
+              {
+                "apiVersion": "apps/v1",
+                "kind": "Deployment",
+                "name": "billing-api",
+                "uid": "783bb1ea-fefa-516e-a216-b8b291ce660a",
+                "controller": true
+              }
+            ]
+          },
+          "spec": {
+            "replicas": 1,
+            "selector": {
+              "matchLabels": {
+                "app": "billing-api"
+              }
+            }
+          }
+        },
+        {
+          "apiVersion": "v1",
+          "kind": "Pod",
+          "metadata": {
+            "name": "billing-api-7c9d-a",
+            "uid": "c356e397-82d4-585e-8ede-a129a972d788",
+            "namespace": "production",
+            "labels": {
+              "app": "billing-api"
+            },
+            "ownerReferences": [
+              {
+                "apiVersion": "apps/v1",
+                "kind": "ReplicaSet",
+                "name": "billing-api-7c9d",
+                "uid": "73d2ad8e-eb56-5975-9818-4dcba27059f2",
+                "controller": true
+              }
+            ]
+          },
+          "spec": {
+            "nodeName": "ip-10-0-4-118"
+          },
+          "status": {
+            "phase": "Running"
+          }
+        }
+      ]
+    },
+    {
+      "snapshot_id": "k8s-acme-staging-20260916T115300Z",
+      "items": [
+        {
+          "apiVersion": "v1",
+          "kind": "Node",
+          "metadata": {
+            "name": "ip-10-0-4-118",
+            "uid": "fd451955-3192-5366-8ec9-f1cee24af59a"
+          },
+          "spec": {
+            "providerID": "aws:///us-east-1a/i-00000000000000201"
+          },
+          "status": {
+            "addresses": [
+              {
+                "type": "InternalIP",
+                "address": "10.0.4.118"
+              }
+            ]
+          }
+        },
+        {
+          "apiVersion": "apps/v1",
+          "kind": "Deployment",
+          "metadata": {
+            "name": "payments-api",
+            "uid": "ee432ee2-a093-5133-bee8-1adf88357f33",
+            "namespace": "staging"
+          },
+          "spec": {
+            "replicas": 1,
+            "selector": {
+              "matchLabels": {
+                "app": "payments-api"
+              }
+            }
+          }
+        },
+        {
+          "apiVersion": "apps/v1",
+          "kind": "ReplicaSet",
+          "metadata": {
+            "name": "payments-api-7c9d",
+            "uid": "e3c8f230-82c3-5967-96b3-e21dd559c332",
+            "namespace": "staging",
+            "ownerReferences": [
+              {
+                "apiVersion": "apps/v1",
+                "kind": "Deployment",
+                "name": "payments-api",
+                "uid": "ee432ee2-a093-5133-bee8-1adf88357f33",
+                "controller": true
+              }
+            ]
+          },
+          "spec": {
+            "replicas": 1,
+            "selector": {
+              "matchLabels": {
+                "app": "payments-api"
+              }
+            }
+          }
+        },
+        {
+          "apiVersion": "v1",
+          "kind": "Pod",
+          "metadata": {
+            "name": "payments-api-7c9d-a",
+            "uid": "67aaed4c-483e-56f3-a312-6c1ebf2a8867",
+            "namespace": "staging",
+            "labels": {
+              "app": "payments-api"
+            },
+            "ownerReferences": [
+              {
+                "apiVersion": "apps/v1",
+                "kind": "ReplicaSet",
+                "name": "payments-api-7c9d",
+                "uid": "e3c8f230-82c3-5967-96b3-e21dd559c332",
+                "controller": true
+              }
+            ]
+          },
+          "spec": {
+            "nodeName": "ip-10-0-4-118"
+          },
+          "status": {
+            "phase": "Running"
+          }
+        }
+      ]
+    }
+  ]
+}

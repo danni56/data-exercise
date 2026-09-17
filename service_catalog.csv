@@ -1,0 +1,6 @@
+snapshot_id,service_id,service_name,environment,owner_team,cluster_id,namespace,deployment_name,declared_dependency_arn
+catalog-acme-20260916T114000Z,svc-payments-prod,payments-api,prod,team-payments,acme-prod,production,payments-api,arn:aws:rds:us-east-1:111111111111:db:payments-db
+catalog-acme-20260916T114000Z,svc-billing-prod,billing-api,prod,team-billing,acme-prod,production,billing-api,
+catalog-acme-20260916T114000Z,svc-reports-prod,reports-api,prod,team-reporting,acme-prod,production,reports-api,
+catalog-acme-20260916T114000Z,svc-payments-staging,payments-api,staging,team-payments,acme-staging,staging,payments-api,arn:aws:rds:us-east-1:222222222222:db:payments-db
+catalog-bravo-20260916T114500Z,svc-payments-prod,payments-api,prod,team-bravo-apps,bravo-prod,production,payments-api,arn:aws:rds:us-east-1:111111111111:db:payments-db

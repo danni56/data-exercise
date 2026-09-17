@@ -1,0 +1,61 @@
+{
+  "snapshot_id": "tf-acme-prod-20260902T090000Z",
+  "lineage": "8c2a4b10-86e5-4ca0-9f37-cb34f3204cd8",
+  "serial": 14,
+  "resources": [
+    {
+      "address": "module.workers.aws_instance.pool[0]",
+      "mode": "managed",
+      "type": "aws_instance",
+      "values": {
+        "id": "i-00000000000000101",
+        "arn": "arn:aws:ec2:us-east-1:111111111111:instance/i-00000000000000101",
+        "tags": {
+          "operator_team": "team-legacy-platform"
+        }
+      }
+    },
+    {
+      "address": "module.workers.aws_instance.pool[1]",
+      "mode": "managed",
+      "type": "aws_instance",
+      "values": {
+        "id": "i-00000000000000102",
+        "arn": "arn:aws:ec2:us-east-1:111111111111:instance/i-00000000000000102",
+        "tags": {
+          "operator_team": "team-platform"
+        }
+      }
+    },
+    {
+      "address": "module.ops.aws_instance.toolbox",
+      "mode": "managed",
+      "type": "aws_instance",
+      "values": {
+        "id": "i-00000000000000099",
+        "arn": "arn:aws:ec2:us-east-1:111111111111:instance/i-00000000000000099",
+        "tags": {
+          "operator_team": "team-platform"
+        }
+      }
+    },
+    {
+      "address": "aws_db_instance.payments",
+      "mode": "managed",
+      "type": "aws_db_instance",
+      "values": {
+        "id": "payments-db",
+        "arn": "arn:aws:rds:us-east-1:111111111111:db:payments-db"
+      }
+    },
+    {
+      "address": "data.aws_instance.lookup",
+      "mode": "data",
+      "type": "aws_instance",
+      "values": {
+        "id": "i-00000000000000103",
+        "arn": "arn:aws:ec2:us-east-1:111111111111:instance/i-00000000000000103"
+      }
+    }
+  ]
+}

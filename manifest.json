@@ -1,0 +1,276 @@
+{
+  "extract_version": "1.0.0",
+  "schema_version": 1,
+  "as_of": "2026-09-16T12:00:00Z",
+  "description": "Synthetic selected-field extracts; no customer data or live credentials.",
+  "extract_notes": "EXTRACT_NOTES.md",
+  "tenants": [
+    "acme",
+    "bravo"
+  ],
+  "query_defaults": {
+    "tenant_id": "acme",
+    "environment": "prod",
+    "application_name": "payments-api"
+  },
+  "snapshots": [
+    {
+      "snapshot_id": "aws-acme-prod-20260916T115000Z",
+      "source_family": "aws",
+      "source_instance_id": "aws-acme-prod",
+      "tenant_id": "acme",
+      "payload_path": "aws_inventory.json",
+      "format": "json",
+      "observed_at": "2026-09-16T11:50:00Z",
+      "exported_at": "2026-09-16T11:59:00Z",
+      "freshness_budget_seconds": 900,
+      "status": "success",
+      "coverage": "complete",
+      "scope": {
+        "account_id": "111111111111",
+        "region": "us-east-1",
+        "environment": "prod",
+        "resource_types": [
+          "aws_instance",
+          "aws_db_instance"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "aws-acme-staging-20260916T115000Z",
+      "source_family": "aws",
+      "source_instance_id": "aws-acme-staging",
+      "tenant_id": "acme",
+      "payload_path": "aws_inventory.json",
+      "format": "json",
+      "observed_at": "2026-09-16T11:50:00Z",
+      "exported_at": "2026-09-16T11:59:00Z",
+      "freshness_budget_seconds": 900,
+      "status": "success",
+      "coverage": "complete",
+      "scope": {
+        "account_id": "222222222222",
+        "region": "us-east-1",
+        "environment": "staging",
+        "resource_types": [
+          "aws_instance",
+          "aws_db_instance"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "aws-bravo-prod-20260916T115200Z",
+      "source_family": "aws",
+      "source_instance_id": "aws-bravo-prod",
+      "tenant_id": "bravo",
+      "payload_path": "aws_inventory.json",
+      "format": "json",
+      "observed_at": "2026-09-16T11:52:00Z",
+      "exported_at": "2026-09-16T11:59:00Z",
+      "freshness_budget_seconds": 900,
+      "status": "success",
+      "coverage": "complete",
+      "scope": {
+        "account_id": "111111111111",
+        "region": "us-east-1",
+        "environment": "prod",
+        "resource_types": [
+          "aws_instance"
+        ],
+        "instance_ids": [
+          "i-00000000000000101"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "tf-acme-prod-20260902T090000Z",
+      "source_family": "terraform",
+      "source_instance_id": "tf-acme-prod",
+      "tenant_id": "acme",
+      "payload_path": "terraform_state/acme-production.json",
+      "format": "json",
+      "observed_at": "2026-09-02T09:00:00Z",
+      "exported_at": "2026-09-16T11:59:00Z",
+      "freshness_budget_seconds": 86400,
+      "status": "success",
+      "coverage": "complete",
+      "scope": {
+        "account_id": "111111111111",
+        "region": "us-east-1",
+        "environment": "prod",
+        "resource_types": [
+          "aws_instance",
+          "aws_db_instance"
+        ],
+        "workspace_id": "acme-prod-core"
+      }
+    },
+    {
+      "snapshot_id": "tf-acme-staging-20260916T113000Z",
+      "source_family": "terraform",
+      "source_instance_id": "tf-acme-staging",
+      "tenant_id": "acme",
+      "payload_path": "terraform_state/acme-staging.json",
+      "format": "json",
+      "observed_at": "2026-09-16T11:30:00Z",
+      "exported_at": "2026-09-16T11:59:00Z",
+      "freshness_budget_seconds": 86400,
+      "status": "success",
+      "coverage": "complete",
+      "scope": {
+        "account_id": "222222222222",
+        "region": "us-east-1",
+        "environment": "staging",
+        "resource_types": [
+          "aws_instance",
+          "aws_db_instance"
+        ],
+        "workspace_id": "acme-staging-core"
+      }
+    },
+    {
+      "snapshot_id": "tf-bravo-prod-20260916",
+      "source_family": "terraform",
+      "source_instance_id": "tf-bravo-prod",
+      "tenant_id": "bravo",
+      "payload_path": null,
+      "format": "json",
+      "observed_at": null,
+      "exported_at": null,
+      "freshness_budget_seconds": 86400,
+      "status": "not_provided",
+      "coverage": "unknown",
+      "scope": {
+        "account_id": "111111111111",
+        "region": "us-east-1",
+        "environment": "prod",
+        "resource_types": [
+          "aws_instance",
+          "aws_db_instance"
+        ],
+        "workspace_id": "bravo-prod-core"
+      }
+    },
+    {
+      "snapshot_id": "k8s-acme-prod-20260916T115500Z",
+      "source_family": "kubernetes",
+      "source_instance_id": "k8s-acme-prod",
+      "tenant_id": "acme",
+      "payload_path": "k8s_resources.json",
+      "format": "json",
+      "observed_at": "2026-09-16T11:55:00Z",
+      "exported_at": "2026-09-16T11:59:00Z",
+      "freshness_budget_seconds": 900,
+      "status": "success",
+      "coverage": "complete",
+      "scope": {
+        "cluster_id": "acme-prod",
+        "account_id": "111111111111",
+        "region": "us-east-1",
+        "environment": "prod",
+        "namespaces": [
+          "production"
+        ],
+        "kinds": [
+          "Deployment",
+          "ReplicaSet",
+          "Pod",
+          "Node"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "k8s-acme-staging-20260916T115300Z",
+      "source_family": "kubernetes",
+      "source_instance_id": "k8s-acme-staging",
+      "tenant_id": "acme",
+      "payload_path": "k8s_resources.json",
+      "format": "json",
+      "observed_at": "2026-09-16T07:53:00-04:00",
+      "exported_at": "2026-09-16T11:59:00Z",
+      "freshness_budget_seconds": 900,
+      "status": "success",
+      "coverage": "complete",
+      "scope": {
+        "cluster_id": "acme-staging",
+        "account_id": "222222222222",
+        "region": "us-east-1",
+        "environment": "staging",
+        "namespaces": [
+          "staging"
+        ],
+        "kinds": [
+          "Deployment",
+          "ReplicaSet",
+          "Pod",
+          "Node"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "k8s-bravo-prod-20260916",
+      "source_family": "kubernetes",
+      "source_instance_id": "k8s-bravo-prod",
+      "tenant_id": "bravo",
+      "payload_path": null,
+      "format": "json",
+      "observed_at": null,
+      "exported_at": null,
+      "freshness_budget_seconds": 900,
+      "status": "not_provided",
+      "coverage": "unknown",
+      "scope": {
+        "cluster_id": "bravo-prod",
+        "account_id": "111111111111",
+        "region": "us-east-1",
+        "environment": "prod",
+        "namespaces": [
+          "production"
+        ],
+        "kinds": [
+          "Deployment",
+          "ReplicaSet",
+          "Pod",
+          "Node"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "catalog-acme-20260916T114000Z",
+      "source_family": "catalog",
+      "source_instance_id": "catalog-acme",
+      "tenant_id": "acme",
+      "payload_path": "service_catalog.csv",
+      "format": "csv",
+      "observed_at": "2026-09-16T11:40:00Z",
+      "exported_at": "2026-09-16T11:59:00Z",
+      "freshness_budget_seconds": 86400,
+      "status": "success",
+      "coverage": "complete",
+      "scope": {
+        "environments": [
+          "prod",
+          "staging"
+        ]
+      }
+    },
+    {
+      "snapshot_id": "catalog-bravo-20260916T114500Z",
+      "source_family": "catalog",
+      "source_instance_id": "catalog-bravo",
+      "tenant_id": "bravo",
+      "payload_path": "service_catalog.csv",
+      "format": "csv",
+      "observed_at": "2026-09-16T11:45:00Z",
+      "exported_at": "2026-09-16T11:59:00Z",
+      "freshness_budget_seconds": 86400,
+      "status": "success",
+      "coverage": "complete",
+      "scope": {
+        "environments": [
+          "prod"
+        ]
+      }
+    }
+  ]
+}
