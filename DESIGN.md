@@ -1,67 +1,67 @@
-# Context layer: run instructions and design note
+# Context layer: how to run it, and why it looks like this
 
 ## Run
 
-Python 3.10+ and the standard library only. From the repository root:
-
 ```bash
-python -m ctxlayer                    # builds the model, writes output/<tenant>/{question_a,question_b,issues}.json for every tenant
-python -m ctxlayer --tenant acme      # one tenant; --environment / --application override the manifest query_defaults
-python -m unittest discover -s tests -v   # 8 tests (pytest tests/ also works)
-python tools/check_inputs.py          # supplied input-envelope check (optional)
+python -m ctxlayer                        # writes output/<tenant>/{question_a,question_b,issues}.json for every tenant
+python -m ctxlayer --tenant acme          # one tenant; --environment / --application override the manifest defaults
+python -m unittest discover -s tests -v   # 8 tests (pytest tests/ works too)
+python tools/check_inputs.py              # optional input check from the brief
 ```
 
-Generated answers for the default request (tenant `acme`, environment `prod`, application `payments-api`) are in `output/acme/`; `output/bravo/` shows the same questions for the tenant whose Terraform and Kubernetes collections were not provided.
+Python 3.10+, standard library only. Answers for the default request (acme / prod / payments-api) are in `output/acme/`. `output/bravo/` shows the same questions for a tenant whose Terraform and Kubernetes were not provided.
 
 ## Schema
 
-| Entity kind | Identity (within tenant) | From | Main claims |
+| Entity | Identity (within a tenant) | Source | Main claims |
 |---|---|---|---|
-| `ec2_instance` | ARN built from InstanceId + collection account/region | AWS inventory | state, private_ip, vpc_id, name, environment_tag, operator_team |
-| `db_instance` | DBInstanceArn | AWS inventory | identifier, status, environment_tag, operator_team |
-| `tf_resource` | (workspace_id, address) | Terraform state | mode, type, provider_id, arn, tags, lineage, serial |
-| `k8s_node` / `k8s_deployment` / `k8s_replicaset` / `k8s_pod` | (cluster_id, metadata.uid) | Kubernetes | name, namespace, owner_references, node_name, provider_id, internal_ip, phase, replicas |
-| `catalog_application` | service_id | Catalog CSV | service_name, environment, owner_team, workload_reference, declared_dependency_arn |
+| `ec2_instance` | ARN from InstanceId + collection account/region | AWS | state, private_ip, vpc_id, name, environment_tag, operator_team |
+| `db_instance` | DBInstanceArn | AWS | identifier, status, environment_tag, operator_team |
+| `tf_resource` | (workspace_id, address) | Terraform | mode, type, provider_id, arn, tags, lineage, serial |
+| `k8s_node` / `k8s_deployment` / `k8s_replicaset` / `k8s_pod` | (cluster_id, uid) | Kubernetes | name, namespace, owner_references, node_name, provider_id, internal_ip, phase, replicas |
+| `catalog_application` | service_id | Catalog | service_name, environment, owner_team, workload_reference, declared_dependency_arn |
 
-| Link kind | From -> to | Source statement | Resolution rule |
+| Link | From -> to | Stated by | Resolved by |
 |---|---|---|---|
-| `terraform_manages` / `terraform_data_reference` | tf_resource -> cloud resource | `values.arn` (+ `mode`) | ARN identity within tenant |
-| `controlled_by` | ReplicaSet -> Deployment, Pod -> ReplicaSet | `metadata.ownerReferences` | UID within cluster |
+| `terraform_manages` / `terraform_data_reference` | tf_resource -> cloud resource | `values.arn` + `mode` | ARN identity |
+| `controlled_by` | ReplicaSet -> Deployment, Pod -> ReplicaSet | `ownerReferences` | UID within cluster |
 | `scheduled_on` | Pod -> Node | `spec.nodeName` | Node name within cluster |
-| `backed_by` | Node -> ec2_instance | `spec.providerID` + manifest cluster account/region | constructed ARN |
-| `runs_as_workload` | application -> Deployment | catalog cluster/namespace/deployment_name | name within cluster+namespace |
+| `backed_by` | Node -> ec2_instance | `spec.providerID` + cluster account/region | constructed ARN |
+| `runs_as_workload` | application -> Deployment | catalog cluster/namespace/deployment_name | name within cluster + namespace |
 | `declares_dependency` | application -> cloud resource | `declared_dependency_arn` | ARN identity |
 
-Every claim and link carries a `SourceRef` (file, JSON pointer or CSV line, snapshot_id, observed_at). Link status is one of `resolved`, `not_observed_in_scope`, `evidence_unavailable`, `no_covering_collection`, `insufficient_identifier`, `ambiguous`.
+Every claim and link carries a source ref (file, JSON pointer or CSV line, snapshot_id, observed_at). Link status is one of `resolved`, `not_observed_in_scope`, `evidence_unavailable`, `no_covering_collection`, `insufficient_identifier`, `ambiguous`.
 
 ## Model and design
 
-The model is a small in-memory store of typed entities, claims, and links (`ctxlayer/model.py`), rebuilt deterministically from the files. I chose typed objects over a relational or graph engine because the hard part is not query power but keeping three things attached to every fact: which record said it, when it was observed, and whether the reference resolved. Dataclasses make that explicit and testable; a database would add setup without changing the reasoning.
+Everything is plain Python objects in memory, rebuilt from the files on every run (`ctxlayer/model.py`). Three ideas: an **entity** is one object as one tenant sees it; a **claim** is one source stating one attribute value, with a file locator and observation time; a **link** is one record pointing at another, kept even when it does not resolve, with a status that says why. I chose dataclasses over a database or graph library because the hard part here is not querying, it is never losing who said what and when. That fits in a few hundred lines and is easy to test.
 
-An **entity** is one object as seen by one tenant. A **claim** is one source's statement of an attribute, so an attribute with two disagreeing claims (i-101's `operator_team`: AWS says `team-platform` on 2026-09-16, Terraform says `team-legacy-platform` on 2026-09-02) stays a visible disagreement rather than a merged value. A **link** is a reference one record makes to another object, kept even when it does not resolve, with a status that says *why*.
+Disagreements stay visible. i-101's `operator_team` is `team-platform` per AWS on 2026-09-16 and `team-legacy-platform` per Terraform on 2026-09-02. Both are reported; neither wins.
 
-Rules the implementation preserves:
+Rules the code enforces:
 
-1. **Tenant is the outermost identity scope.** `Store.add_link` refuses links whose endpoints belong to different tenants, and queries only read through a `TenantView` that will not hand out another tenant's entities, links, or collections. The same provider object observed under two tenants (i-101 in account 111111111111 for both `acme` and `bravo`) is two entities; bravo's answer never sees acme's Terraform binding.
-2. **Absence is only asserted inside a complete, available collection.** A reference that fails to resolve gets `not_observed_in_scope` only when a `success/complete` collection covers the referenced account/region/type (or cluster/kind/namespace); otherwise it is `evidence_unavailable` or `no_covering_collection`. This is what separates "no Terraform binding for i-104 in acme-prod-core" from "no Terraform evidence at all for bravo".
-3. **Labels and addresses are never identity.** Name tags, Node names, and private IPs are attributes; they never merge or match records. `mode=data` Terraform records are never bindings.
+1. **Tenant first.** `Store.add_link` rejects links across tenants, and queries only see a `TenantView`. The same instance in a shared account (i-101 for both `acme` and `bravo`) is two entities; bravo never sees acme's Terraform binding.
+2. **Absence needs a complete collection.** An unresolved reference is `not_observed_in_scope` only when a provided, complete collection covers that account/region/type (or cluster/kind/namespace). Otherwise it is `evidence_unavailable` or `no_covering_collection`. That is the difference between "no binding for i-104 in acme-prod-core" and "no Terraform evidence at all for bravo".
+3. **Labels are not identity.** Name tags, Node names and private IPs never match records. `mode=data` is never a binding.
 
-## Consequential decisions
+## Two decisions
 
-**Tenant-scoped entities rather than one entity per ARN with tenant-tagged claims.** The alternative is more compact and shows both observations of i-101 in one place. I chose separate entities so tenant enforcement holds structurally in the store instead of relying on every query to filter claims. The cross-tenant fact is still recorded, but only in the issues report's `cross_tenant_observations` section, which is marked platform-only. I would revisit this if tenants are guaranteed disjoint by account (the split becomes redundant) or if a cross-tenant reconciliation use case appears.
+**Entities are per tenant, not per ARN.** One entity per ARN with tenant-tagged claims would be more compact and would show both views of i-101 in one place. I split them so tenant isolation is a property of the store rather than something every query must get right. I would revisit this if tenants were guaranteed disjoint by account, or if someone needed cross-tenant reconciliation.
 
-**Coverage-derived statuses computed from manifest scopes, rather than a resolved/unresolved boolean.** The statuses depend on scope predicates (`ctxlayer/scope.py`) that mirror the manifest's scope fields: right for this bounded contract, brittle if scopes gain filters that are not field matches (tag-based selection, partial coverage). If `coverage: partial` appears or scope shapes diverge across source instances, I would move to per-collection coverage functions supplied by each ingester.
+**Link status comes from manifest scopes.** The statuses rest on predicates in `ctxlayer/scope.py` that mirror the manifest scope fields. Simple and right for this contract, brittle if scopes grow filters that are not plain field matches. A `coverage: partial` value, or scope shapes that differ per source, would push me to per-collection coverage functions owned by each ingester.
 
-## Verification
+## One thing I checked
 
-Assumption checked: a Node without `spec.providerID` could fall back to matching `InternalIP` against `PrivateIpAddress`. I queried the built model for instances sharing `10.0.9.9` and found two in the same account (i-104 in `vpc-…0001`, i-105 in `vpc-…0002`), and the prod/staging pair both use `10.0.4.118`. IP matching is therefore not a resolution rule; look-alikes appear only as `candidates_not_used` on the link, so a reader sees why the hop stopped. The test builds a modified copy with a `providerID` added and confirms the same rule then resolves to exactly i-105. Along the way I also confirmed the `-04:00` staging timestamp parses to an age of 420 s (within budget) rather than being compared as a string.
+I assumed a Node without `providerID` could fall back to matching `InternalIP` to `PrivateIpAddress`. The data says no: i-104 and i-105 share `10.0.9.9` in different VPCs, and prod and staging both use `10.0.4.118`. So IP matching is not a rule; look-alikes appear only as `candidates_not_used`. The test adds a `providerID` to a copy of the input and confirms the same rule then resolves to exactly i-105. I also checked that the `-04:00` staging timestamp parses to a 420 s age instead of being compared as a string.
 
-## Readiness and next steps
+## What you can rely on, and what you cannot
 
-A read-only internal consumer may rely on: tenant isolation of answers and evidence; the identity rules above; the link-status vocabulary and its meanings (emitted in each answer); every claim carrying a file locator and observation time; and staleness being flagged wherever a stale collection contributes. They should not read `binding_found` as "managed now": the only Terraform state for acme prod is 14 days past its 24 h budget, so Question A's findings, positive and negative, describe 2026-09-02.
+Safe to rely on: tenant isolation of answers and evidence; the identity rules above; the status vocabulary (each answer carries its meanings); a file locator and observation time on every claim; staleness flagged wherever a stale collection contributes.
 
-Highest-risk gap: that stale state is the sole management evidence, and the state also references an instance (i-099) the complete inventory no longer contains, which suggests the state and the inventory have drifted. Next two changes: (1) ingest a fresh acme-prod state and compare `lineage`/`serial` so the layer can say whether the state moved, not just that it is old; (2) add Service/Endpoints kinds to the Kubernetes collection so Question B can substantiate a runtime path from `payments-api` to `payments-db` instead of stopping at a catalog declaration plus placement.
+Do not read `binding_found` as "managed now". The only Terraform state for acme prod is 14 days past its 24 h budget, so every Question A finding describes 2026-09-02. That state also lists i-099, which the complete inventory no longer has. That drift is the biggest risk.
 
-## Time and unfinished work
+Next: (1) ingest a fresh acme-prod state and compare `lineage` and `serial`, so the layer can say whether the state moved rather than only that it is old; (2) add Service and Endpoints objects to the Kubernetes collection so Question B can show a runtime path to `payments-db` instead of a catalog declaration plus placement.
 
-Roughly: reading the brief and extract notes 40 min; model, ingest, and resolution 1 h 15; queries and output shaping 1 h; tests 30 min; this note 30 min. Unfinished: the issues report's `affects` field is by link kind, not by whether the entity is on a queried path; an ambiguous catalog match answers for the first `service_id` and lists the rest; inventory collections that disagree on an instance's state are noted but not reconciled; no incremental processing or history.
+## Time and loose ends
+
+About four hours: 40 min reading, 1 h 15 on model, ingest and resolution, 1 h on queries and output, 30 min tests, 30 min this note. Not done: the issues report's `affects` is by link kind, not by whether the entity is on a queried path; an ambiguous catalog match answers for the first `service_id` and lists the rest; inventory collections that disagree on a state are noted, not reconciled; no incremental processing or history.
